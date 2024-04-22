@@ -1,6 +1,8 @@
-# Exploiting Blind SQLi (DVWA) (Security Level: Low)
+# Blind SQL Injection With Binary Search (DVWA) (Security Level: Low)
 
-The Python scripts provide a comprehensive framework for conducting Blind SQL Injection attacks against the Damn Vulnerable Web Application (DVWA). The first script introduces foundational classes and methods to facilitate HTTP sessions, set security levels, parse SQL injection responses, and construct SQL queries dynamically. Building on this foundation, the second script implements a systematic approach to exploit SQL injection vulnerabilities, aiming to extract sensitive database information such as the database name, table names, column details, and ultimately, user credentials. It starts by establishing a testing session with DVWA, then sequentially narrows down the search through a series of crafted SQL queries to identify the database structure and contents, with stages for determining the length and content of database names, enumerating tables and columns, and extracting user passwords. User interaction is integrated for targeted exploration, allowing for the interruption of processes to streamline the data extraction phases. This combination showcases a methodical exploitation process that leverages automation and user input to uncover and exploit vulnerabilities in web applications.
+The revised Python script enhances the efficiency of Blind SQL Injection attacks against the Damn Vulnerable Web Application (DVWA) by incorporating binary search techniques. Central to this approach is the `get_query_result` function, which executes SQL injection queries tailored with specific table and column names, a target username, and a dynamically calculated midpoint value. This function's results, interpreted as `True` for successful conditions and `False` otherwise, facilitate the binary search strategy, drastically cutting down the query count needed for determining the password hash's length over traditional linear search methods.
+
+Further refinement is seen in character extraction for the password hash. By leveraging the `ASCII(SUBSTR())` function, the script conducts a binary search on ASCII values to pinpoint each hash character efficiently. This method contrasts sharply with the exhaustive linear search, offering a notable reduction in queries by halving the search space until the correct character is identified. This dual application of binary search—first, to ascertain the hash length and then to decode its characters—marks a significant leap in optimizing SQL injection efforts, ensuring a faster and more resource-effective breach process.
 
 ## Disclaimer
 
@@ -12,11 +14,11 @@ This project is based on the original [blind_sqli project](https://github.com/St
 
 ## Features
 
-- **Automated SQL Injection Attacks**: Automates the process of conducting Blind SQL Injection to uncover vulnerabilities.
-- **Dynamic SQL Query Construction**: Builds SQL queries on the fly to probe the database structure and extract data.
-- **Session Management**: Manages HTTP sessions and CSRF tokens to maintain interaction with DVWA under varying security levels.
-- **Real-Time Feedback and Interaction**: Provides ongoing feedback and allows for user interaction to refine the data extraction process.
-- **Security Level Manipulation**: Adjusts the security level of DVWA to test different strengths of SQL injection defenses.
+- **Efficient Data Extraction**: Implements binary search algorithms to determine the length of data fields and character values, significantly reducing the number of queries required compared to linear search methods.
+- **Targeted SQL Injection**: Uses precise SQL injection techniques tailored to extract specific information such as database names, table contents, and password hashes.
+- **Interactive Exploration**: Allows users to interactively specify targets for exploration, enhancing the flexibility and focus of the attack.
+- **Advanced Query Construction**: Dynamically constructs SQL queries based on user input and binary search outcomes, optimizing the process for efficiency and effectiveness.
+- **Security Level Adjustment**: Capable of adjusting the security settings of the target application (DVWA) to test different levels of SQL injection defenses.
 
 ## Prerequisites
 
@@ -41,7 +43,7 @@ This project is based on the original [blind_sqli project](https://github.com/St
 
 ## DVWA Setup (THM)
 
-1. **Setup VPN connection to DVWA machine in THM.**: [TryHackMe | DVWA](https://tryhackme.com/room/dvwa)
+1. **Setup VPN connection to DVWA machine in THM.**
 2. **Setup OpenVPN Connection to Access THM's DVWA Machine:**
 - Download your OpenVPN configuration file from THM.
 - Use a terminal or command prompt to start the OpenVPN connection:
@@ -60,11 +62,11 @@ This project is based on the original [blind_sqli project](https://github.com/St
     - Set the security level to **Low**. This is crucial as the script is designed to work with DVWA under low security settings.
     - Navigate back to the home page and click on **SQL Injection (Blind)** from the left menu to ensure it's ready for testing.
     ![DVWA Security Level Low](/images/DVWA_Security_Level_Low.png)
-    
+  
 3. **Run Script and Provide Your DVWA IP Address:**
     
     ```bash
-    python3 main_low.py
+    python3 restricted_blind_sqli.py
     ```
     
     - Enter the IP address of the DVWA machine when prompted to execute the SQL injection.
@@ -74,40 +76,60 @@ This project is based on the original [blind_sqli project](https://github.com/St
 
 ## How It Works
 
-- The first script establishes a session with DVWA, manages CSRF tokens, and sets the security level. It also provides foundational methods for sending crafted SQL queries and interpreting the responses.
-- The second script uses the methods defined in the first script to perform detailed enumeration of the database structure. It conducts targeted attacks to extract names of databases, tables, and columns, and retrieves sensitive user data. Throughout this process, it utilizes user input to refine attack vectors and optimize data extraction.
+The script operates in several key phases to exploit Blind SQL Injection vulnerabilities:
+
+1. **Session Initialization**: Establishes a session with the Damn Vulnerable Web Application (DVWA), handling login and CSRF token management.
+2. **Setting Security Level**: Adjusts the security level of DVWA to the lowest setting to facilitate testing and manipulation.
+3. **Binary Search for Data Length**: Employs binary search techniques to efficiently determine the length of the database name, significantly reducing the number of required queries.
+4. **Character Extraction Using Binary Search**: Further applies binary search to the ASCII values to pinpoint each character of the database name, table names, and ultimately, user password hashes.
+5. **Interactive User Input**: Allows users to specify particular tables and columns for targeted data extraction, providing control over the scope of the SQL injection attack.
+6. **Data Retrieval**: Executes crafted SQL queries to extract and display sensitive information based on the findings from binary searches, such as the names and contents of database tables and user credentials.
+7. **Query Optimization and Feedback**: Throughout the process, the script provides real-time feedback on the progress of the attack and optimizes SQL queries to minimize the database server's load and response time.
+
+The combination of binary search with interactive and dynamic SQL injection makes this script highly effective and efficient for educational and testing purposes in environments like DVWA.
 
 ## Output Example
 
 ```bash
-$ python3 main_low.py
+$ python3 restricted_blind_sqli.py
 Enter the DVWA server IP address: 10.10.x.x
 [+] Length of the database name is 4
+Queries made to find database name length: 4
+
 [+] Database name discovered: dvwa
+Queries made to find database name: 46
+
 [+] Number of tables in the database: 2
+Queries made to find number of tables: 1
+
          guestbook
          users
+Queries made to find table names: 287
+
 Enter the name of the table to analyze: users
 [+] Number of columns in 'users': 8
-[!] Attempting to accelerate the process. Press CTRL+C when you find the targeted columns.
+Queries made to find number of columns: 7
+
+[!] Attempting to accelerate the process. Press CTRL+C when you find the target columns.
          userid
          firstname
          lastname
          user
          password
-         avatar
-         lastlogin
-         failedlogi
+^C
+User discovery halted!
 Enter the username column name: user
 Enter the password hash column name: password
 [!] To further speed up the process, press CTRL+C when you find the target user
 | __________ admin
-| __________ gordonb
 ^C
 User discovery halted!
 Enter the target username for password hash extraction: admin
-[+] Password hash length for 'admin': 32
+[+] Length of the password hash for 'admin': 32
+Queries made to find password hash length: 1
+
 [+] Password hash for 'admin': 5f4dcc3b5aa765d61d8327deb882cf99
+Queries made to extract password hash: 32
 ```
 ![Crackstation](/images/CrackStation_results.png)
 
