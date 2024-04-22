@@ -119,4 +119,4 @@ If you have an idea for an improvement or if you're interested in collaborating,
 
 ## License
 
-This project is licensed under the GNU General Public (GPL) License - see the [LICENSE](https://github.com/CyberWolfByte/website-demo/blob/main/LICENSE) file for details.
+This project is licensed under the GNU General Public (GPL) License - see the [LICENSE](https://github.com/CyberWolfByte/dvwa/blob/main/LICENSE) file for details.
