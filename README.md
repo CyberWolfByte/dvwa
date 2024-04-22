@@ -41,8 +41,6 @@ This project is based on the original [blind_sqli project](https://github.com/St
 
 ## DVWA Setup (THM)
 
-[CrackStation - Online Password Hash Cracking - MD5, SHA1, Linux, Rainbow Tables, etc.](https://crackstation.net/)
-
 1. **Setup VPN connection to DVWA machine in THM.**: [TryHackMe | DVWA](https://tryhackme.com/room/dvwa)
 2. **Setup OpenVPN Connection to Access THM's DVWA Machine:**
 - Download your OpenVPN configuration file from THM.
