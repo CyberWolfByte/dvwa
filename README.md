@@ -35,7 +35,7 @@ This project is based on the original [blind_sqli project](https://github.com/St
 1. **Python Environment Setup**: Ensure Python and pip are installed. Install the required libraries using:
     
     ```bash
-    sudo pip install requests beautifulsoup4
+    sudo pip install requests beautifulsoup4 enum
     ```
     
 2. **Download Scripts**: Clone or download the scripts from the project repository to your local machine.
